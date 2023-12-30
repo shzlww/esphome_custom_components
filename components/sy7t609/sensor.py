@@ -40,7 +40,8 @@ SY7T609 = sy7t609_ns.class_("SY7T609_UART", cg.PollingComponent, uart.UARTDevice
 
 # Actions
 ResetEnergyAction = sy7t609_ns.class_("ResetEnergyAction", automation.Action)
-
+ResetCalibrationAction = sy7t609_ns.class_("ResetCalibrationAction", automation.Action)
+PrintDebugMsgAction = sy7t609_ns.class_("PrintDebugMsgAction", automation.Action)
 CONFIG_SCHEMA = (
     cv.Schema(
         {
@@ -76,14 +77,14 @@ CONFIG_SCHEMA = (
             ),
             cv.Optional(CONF_ENERGY): sensor.sensor_schema(
                 unit_of_measurement=UNIT_WATT_HOURS,
-                accuracy_decimals=0,
+                accuracy_decimals=2,
                 device_class=DEVICE_CLASS_ENERGY,
                 state_class=STATE_CLASS_TOTAL_INCREASING,
             ),
             cv.Optional(CONF_FREQUENCY): sensor.sensor_schema(
                 unit_of_measurement=UNIT_HERTZ,
                 icon=ICON_CURRENT_AC,
-                accuracy_decimals=1,
+                accuracy_decimals=0,
                 state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_CHIP_TEMPERATURE): sensor.sensor_schema(
@@ -112,6 +113,31 @@ async def reset_energy_to_code(config, action_id, template_arg, args):
     paren = await cg.get_variable(config[CONF_ID])
     return cg.new_Pvariable(action_id, template_arg, paren)
 
+@automation.register_action(
+    "sy7t609.reset_calibration",
+    ResetCalibrationAction,
+    maybe_simple_id(
+        {
+            cv.Required(CONF_ID): cv.use_id(SY7T609),
+        }
+    ),
+)
+async def reset_calibration_to_code(config, action_id, template_arg, args):
+    paren = await cg.get_variable(config[CONF_ID])
+    return cg.new_Pvariable(action_id, template_arg, paren)
+
+@automation.register_action(
+    "sy7t609.debug",
+    PrintDebugMsgAction,
+    maybe_simple_id(
+        {
+            cv.Required(CONF_ID): cv.use_id(SY7T609),
+        }
+    ),
+)
+async def debug_to_code(config, action_id, template_arg, args):
+    paren = await cg.get_variable(config[CONF_ID])
+    return cg.new_Pvariable(action_id, template_arg, paren)
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
