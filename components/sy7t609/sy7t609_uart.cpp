@@ -29,21 +29,21 @@ void SY7T609_UART::loop()
     this->last_read_ = now;
   }
   
-  while (this->available() == SSI_UART_READ_RECV_PKG_SIZE) 
+  if (now - this->last_read_ > 20 && this->available() == SSI_UART_READ_RECV_PKG_SIZE) 
   {
     auto resp = *this->read_array<SSI_UART_READ_RECV_PKG_SIZE>();
-    
+    bool bSuccess = true;
     if (resp[0] != REPLY_ACK_WITH_DATA)
     {
         //SSI Error
         ESP_LOGE(TAG, "SY7T609_UART process_state[%d],invalid REPLY_ACK_WITH_DATA! 0x%02X", m_process_state,resp[0]);
-        continue;
+        bSuccess = false;
     }
     uint8_t sum = checksum<SSI_UART_READ_RECV_PKG_SIZE>(resp);
     if (sum != resp[resp.max_size() - 1])
     {
       ESP_LOGW(TAG, "SY7T609_UART process_state[%d],invalid checksum! 0x%02X != 0x%02X",m_process_state, sum, resp[resp.max_size() - 1]);
-      continue;
+      bSuccess = false;
     }
     switch (m_process_state)
     {
@@ -51,9 +51,10 @@ void SY7T609_UART::loop()
       {
         float data = readPF(resp);
         if (this->power_factor_sensor_ != nullptr)
-          this->power_factor_sensor_->publish_state(data);
+        {
+          this->power_factor_sensor_->publish_state( bSuccess ? data : NAN );
+        }
         ESP_LOGD(TAG, "Got PF :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
-
         this->write_state_((process_state)(m_process_state + 1));
         break;
       }
@@ -62,7 +63,9 @@ void SY7T609_UART::loop()
       { 
         float data = readVRMS(resp);
         if (this->voltage_sensor_ != nullptr)
-          this->voltage_sensor_->publish_state(data);
+        {
+          this->voltage_sensor_->publish_state( bSuccess ? data : NAN );
+        }
         ESP_LOGD(TAG, "Got VRMS :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
@@ -71,7 +74,9 @@ void SY7T609_UART::loop()
       { 
         float data = readIRMS(resp);
         if (this->current_sensor_ != nullptr)
-          this->current_sensor_->publish_state(data);
+        {
+          this->current_sensor_->publish_state( bSuccess ? data : NAN );
+        }
         ESP_LOGD(TAG, "Got IRMS :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
@@ -80,7 +85,9 @@ void SY7T609_UART::loop()
       {
         float data = readPower(resp);
         if (this->power_sensor_ != nullptr)
-          this->power_sensor_->publish_state(data);
+        {
+          this->power_sensor_->publish_state( bSuccess ? data : NAN );
+        }
         ESP_LOGD(TAG, "Got POWER :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
@@ -89,8 +96,11 @@ void SY7T609_UART::loop()
       case PROCESS_STATE_READ_REACTIVE_POWER: 
       {
         float data = readReactivePower(resp);
+
         if (this->power_reactive_sensor_ != nullptr)
-          this->power_reactive_sensor_->publish_state(data);
+        {
+          this->power_reactive_sensor_->publish_state( bSuccess ? data : NAN );
+        }
         ESP_LOGD(TAG, "Got REACTIVE_POWER :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
@@ -100,7 +110,9 @@ void SY7T609_UART::loop()
       { 
         float data = readEnergy(resp);
         if (this->energy_sensor_ != nullptr)
-          this->energy_sensor_->publish_state(data);
+        {
+          this->energy_sensor_->publish_state( bSuccess ? data : NAN );
+        }
         ESP_LOGD(TAG, "Got ENERGY :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
@@ -110,7 +122,8 @@ void SY7T609_UART::loop()
       {
         float data = readFrequency(resp);
         if (this->frequency_sensor_ != nullptr)
-          this->frequency_sensor_->publish_state(data);
+          this->frequency_sensor_->publish_state( bSuccess ? data : NAN );;
+
         ESP_LOGD(TAG, "Got FREQUENCY :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
@@ -120,7 +133,7 @@ void SY7T609_UART::loop()
       {
         float data = readTemperature(resp);
         if (this->temperature_sensor_ != nullptr)
-          this->temperature_sensor_->publish_state(data);
+          this->temperature_sensor_->publish_state( bSuccess ? data : NAN );
         ESP_LOGD(TAG, "Got TEMPERATURE :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_(PROCESS_DONE);
         break;
@@ -468,7 +481,7 @@ void SY7T609_UART::uartSendReadCmd(uint16_t addr)
 
   this->write_array(data);
   this->flush();
-  delay(20);
+  //delay(20);
 }
 
 void SY7T609_UART::uartSendWriteCmd(uint16_t addr,uint32_t value)
@@ -488,7 +501,7 @@ void SY7T609_UART::uartSendWriteCmd(uint16_t addr,uint32_t value)
   
   this->write_array(data);
   this->flush();
-  delay(20);
+  //delay(20);
 
 }
 void SY7T609_UART::write_state_(process_state state)
@@ -727,7 +740,7 @@ void SY7T609_UART::reset_energy_()
 {
   ESP_LOGI(TAG, "SY7T609_UART Sy7t609 RESET energy, begin...");
   write_state_(PROCESS_STATE_WRITE_CMD_REG_CLEAR_ENGERGY_COUNTERS);
-  //delay(20);
+  delay(20);
   ESP_LOGI(TAG, "SY7T609_UART Sy7t609 RESET energy, end.");
 }
 
@@ -738,10 +751,10 @@ void SY7T609_UART::reset_calibration_()
   for(int state = PROCESS_STATE_WRITE_ADDR_IGAIN; state < PROCESS_STATE_WRITE_CMD_REG_SAVE_TO_FLASH; state++)
   {
       write_state_((process_state)state);
-      //delay(20);
+      delay(20);
   }
   write_state_(PROCESS_STATE_WRITE_CMD_REG_SAVE_TO_FLASH);
-  //delay(20);
+  delay(20);
   ESP_LOGI(TAG, "SY7T609_UART Sy7t609 RESET calibration, end.");
 
 }
@@ -756,7 +769,7 @@ void SY7T609_UART::print_debug_msg_()
       this->read();
     }
     write_state_((process_state)state);
-    //delay(20);
+    delay(20);
     printRegisterValue();
   }
   ESP_LOGI(TAG, "SY7T609_UART Sy7t609 PRINT debug message, end.");
