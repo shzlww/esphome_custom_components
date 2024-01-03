@@ -9,6 +9,7 @@ static const char *const TAG = "sy7t609";
 
 void SY7T609_UART::setup()
 {
+  m_vecActionCallback.clear();
   // Clear UART buffer
   while (this->available())
   {
