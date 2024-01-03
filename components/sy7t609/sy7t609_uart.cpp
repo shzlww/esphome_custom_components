@@ -9,7 +9,6 @@ static const char *const TAG = "sy7t609";
 
 void SY7T609_UART::setup()
 {
-  m_vecActionCallback.clear();
   // Clear UART buffer
   while (this->available())
   {
@@ -28,6 +27,12 @@ void SY7T609_UART::loop()
       this->read();
     }
     this->last_read_ = now;
+
+    //reset系统之后，有时会收不到uart消息，导致update函数无法正常进行。此处算作补丁代码，一段时间没有收到uart消息，则重置process_state。
+    if(m_process_state != PROCESS_DONE)
+    {
+      m_process_state = PROCESS_DONE;
+    }
   }
   
   if (now - this->last_read_ > 20 && this->available() == SSI_UART_READ_RECV_PKG_SIZE) 
@@ -155,7 +160,7 @@ void SY7T609_UART::update()
   }
   else
   {
-    ESP_LOGI(TAG, "SY7T609_UART NOT update,state[%d],handleCallback[%d].",m_process_state,m_vecActionCallback.size());
+    ESP_LOGI(TAG, "SY7T609_UART NOT update,state[%d],CallbackTaskSize[%d].",m_process_state,m_vecActionCallback.size());
   }
 }
 uint16_t SY7T609_UART::getRegisterAddrByState(process_state state)
@@ -699,6 +704,7 @@ void SY7T609_UART::handleActionCallback()
   }
 
 }
+
 
 bool SY7T609_UART::isReadRegisterProcess(process_state state)
 {
