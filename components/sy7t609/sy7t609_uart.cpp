@@ -60,7 +60,7 @@ void SY7T609_UART::loop()
         {
           this->power_factor_sensor_->publish_state( bSuccess ? data : NAN );
         }
-        ESP_LOGD(TAG, "Got PF :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
+        //ESP_LOGD(TAG, "Got PF :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
       }
@@ -72,7 +72,7 @@ void SY7T609_UART::loop()
         {
           this->voltage_sensor_->publish_state( bSuccess ? data : NAN );
         }
-        ESP_LOGD(TAG, "Got VRMS :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
+        //ESP_LOGD(TAG, "Got VRMS :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
       }
@@ -83,7 +83,7 @@ void SY7T609_UART::loop()
         {
           this->current_sensor_->publish_state( bSuccess ? data : NAN );
         }
-        ESP_LOGD(TAG, "Got IRMS :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
+        //ESP_LOGD(TAG, "Got IRMS :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
       }
@@ -94,7 +94,7 @@ void SY7T609_UART::loop()
         {
           this->power_sensor_->publish_state( bSuccess ? data : NAN );
         }
-        ESP_LOGD(TAG, "Got POWER :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
+        //ESP_LOGD(TAG, "Got POWER :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
       }
@@ -107,7 +107,7 @@ void SY7T609_UART::loop()
         {
           this->power_reactive_sensor_->publish_state( bSuccess ? data : NAN );
         }
-        ESP_LOGD(TAG, "Got REACTIVE_POWER :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
+        //ESP_LOGD(TAG, "Got REACTIVE_POWER :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
       }
@@ -119,7 +119,7 @@ void SY7T609_UART::loop()
         {
           this->energy_sensor_->publish_state( bSuccess ? data : NAN );
         }
-        ESP_LOGD(TAG, "Got ENERGY :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
+        //ESP_LOGD(TAG, "Got ENERGY :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
       }
@@ -130,7 +130,7 @@ void SY7T609_UART::loop()
         if (this->frequency_sensor_ != nullptr)
           this->frequency_sensor_->publish_state( bSuccess ? data : NAN );;
 
-        ESP_LOGD(TAG, "Got FREQUENCY :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
+        //ESP_LOGD(TAG, "Got FREQUENCY :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
       }
@@ -140,7 +140,7 @@ void SY7T609_UART::loop()
         float data = readTemperature(resp);
         if (this->temperature_sensor_ != nullptr)
           this->temperature_sensor_->publish_state( bSuccess ? data : NAN );
-        ESP_LOGD(TAG, "Got TEMPERATURE :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
+        //ESP_LOGD(TAG, "Got TEMPERATURE :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_(PROCESS_DONE);
         break;
       }
@@ -155,7 +155,7 @@ void SY7T609_UART::update()
 {
   if(m_process_state == PROCESS_DONE && !isNeedHandleActionCallback())
   {
-    ESP_LOGI(TAG, "SY7T609_UART update, begin");
+    //ESP_LOGI(TAG, "SY7T609_UART update, begin");
     this->write_state_(PROCESS_STATE_READ_PF); 
   }
   else
