@@ -128,7 +128,7 @@ template<typename... Ts> class ResetEnergyAction : public Action<Ts...>
   void play(Ts... x) override 
   { 
     this->sy7t609_->addActionCallBack(&SY7T609_UART::reset_energy_); 
-    ESP_LOGI("ResetEnergyAction", "SY7T609_UART addActionCallBack,[reset_energy_]");
+    //ESP_LOGI("ResetEnergyAction", "SY7T609_UART addActionCallBack,[reset_energy_]");
   }
 
  protected:
@@ -143,7 +143,7 @@ template<typename... Ts> class ResetCalibrationAction : public Action<Ts...>
   void play(Ts... x) override 
   { 
     this->sy7t609_->addActionCallBack(&SY7T609_UART::reset_calibration_); 
-    ESP_LOGI("ResetCalibrationAction", "SY7T609_UART addActionCallBack,[reset_calibration_]");
+    //ESP_LOGI("ResetCalibrationAction", "SY7T609_UART addActionCallBack,[reset_calibration_]");
   }
 
  protected:
@@ -158,11 +158,11 @@ template<typename... Ts> class PrintDebugMsgAction : public Action<Ts...>
   void play(Ts... x) override 
   { 
     this->sy7t609_->addActionCallBack(&SY7T609_UART::print_debug_msg_); 
-    ESP_LOGI("PrintDebugMsgAction", "SY7T609_UART addActionCallBack,[print_debug_msg_]");
+    //ESP_LOGI("PrintDebugMsgAction", "SY7T609_UART addActionCallBack,[print_debug_msg_]");
   }
 
  protected:
   SY7T609_UART *sy7t609_;
 };
-}  // namespace pzem004t
+}  // namespace sy7t609
 }  // namespace esphome
