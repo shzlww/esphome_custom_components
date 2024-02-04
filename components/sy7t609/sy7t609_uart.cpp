@@ -55,10 +55,10 @@ void SY7T609_UART::loop()
     {
       case PROCESS_STATE_READ_PF:
       {
-        float data = readPF(resp);
-        if (this->power_factor_sensor_ != nullptr)
+        if (this->power_factor_sensor_ != nullptr && bSuccess)
         {
-          this->power_factor_sensor_->publish_state( bSuccess ? data : NAN );
+	  float data = readPF(resp);
+          this->power_factor_sensor_->publish_state(data);
         }
         //ESP_LOGD(TAG, "Got PF :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
@@ -67,10 +67,10 @@ void SY7T609_UART::loop()
 
       case PROCESS_STATE_READ_VRMS: 
       { 
-        float data = readVRMS(resp);
-        if (this->voltage_sensor_ != nullptr)
+        if (this->voltage_sensor_ != nullptr && bSuccess)
         {
-          this->voltage_sensor_->publish_state( bSuccess ? data : NAN );
+          float data = readVRMS(resp);
+          this->voltage_sensor_->publish_state(data);
         }
         //ESP_LOGD(TAG, "Got VRMS :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
@@ -78,10 +78,10 @@ void SY7T609_UART::loop()
       }
       case PROCESS_STATE_READ_IRMS: 
       { 
-        float data = readIRMS(resp);
-        if (this->current_sensor_ != nullptr)
+        if (this->current_sensor_ != nullptr && bSuccess)
         {
-          this->current_sensor_->publish_state( bSuccess ? data : NAN );
+          float data = readIRMS(resp);
+          this->current_sensor_->publish_state(data);
         }
         //ESP_LOGD(TAG, "Got IRMS :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
@@ -89,10 +89,10 @@ void SY7T609_UART::loop()
       }
       case PROCESS_STATE_READ_POWER: 
       {
-        float data = readPower(resp);
-        if (this->power_sensor_ != nullptr)
+        if (this->power_sensor_ != nullptr && bSuccess)
         {
-          this->power_sensor_->publish_state( bSuccess ? data : NAN );
+	  float data = readPower(resp);
+          this->power_sensor_->publish_state(data);
         }
         //ESP_LOGD(TAG, "Got POWER :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
@@ -101,11 +101,10 @@ void SY7T609_UART::loop()
 
       case PROCESS_STATE_READ_REACTIVE_POWER: 
       {
-        float data = readReactivePower(resp);
-
-        if (this->power_reactive_sensor_ != nullptr)
+        if (this->power_reactive_sensor_ != nullptr && bSuccess)
         {
-          this->power_reactive_sensor_->publish_state( bSuccess ? data : NAN );
+          float data = readReactivePower(resp);
+          this->power_reactive_sensor_->publish_state(data);
         }
         //ESP_LOGD(TAG, "Got REACTIVE_POWER :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
@@ -114,10 +113,10 @@ void SY7T609_UART::loop()
 
       case PROCESS_STATE_READ_EPPCNT: 
       { 
-        float data = readEnergy(resp);
-        if (this->energy_sensor_ != nullptr)
+        if (this->energy_sensor_ != nullptr && bSuccess)
         {
-          this->energy_sensor_->publish_state( bSuccess ? data : NAN );
+	  float data = readEnergy(resp);
+          this->energy_sensor_->publish_state(data);
         }
         //ESP_LOGD(TAG, "Got ENERGY :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
@@ -126,10 +125,11 @@ void SY7T609_UART::loop()
 
       case PROCESS_STATE_READ_FREQUENCY: 
       {
-        float data = readFrequency(resp);
-        if (this->frequency_sensor_ != nullptr)
-          this->frequency_sensor_->publish_state( bSuccess ? data : NAN );;
-
+        if (this->frequency_sensor_ != nullptr && bSuccess)
+	{
+          float data = readFrequency(resp);
+	  this->frequency_sensor_->publish_state(data);
+	}
         //ESP_LOGD(TAG, "Got FREQUENCY :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
@@ -137,9 +137,11 @@ void SY7T609_UART::loop()
 
       case PROCESS_STATE_READ_TEMPERATURE: 
       {
-        float data = readTemperature(resp);
-        if (this->temperature_sensor_ != nullptr)
-          this->temperature_sensor_->publish_state( bSuccess ? data : NAN );
+        if (this->temperature_sensor_ != nullptr && bSuccess)
+        {
+	  float data = readTemperature(resp);
+          this->temperature_sensor_->publish_state(data);
+        }
         //ESP_LOGD(TAG, "Got TEMPERATURE :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_(PROCESS_DONE);
         break;
