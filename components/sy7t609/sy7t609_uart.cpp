@@ -57,7 +57,7 @@ void SY7T609_UART::loop()
       {
         if (this->power_factor_sensor_ != nullptr && bSuccess)
         {
-	  float data = readPF(resp);
+          float data = readPF(resp);
           this->power_factor_sensor_->publish_state(data);
         }
         //ESP_LOGD(TAG, "Got PF :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
@@ -91,7 +91,7 @@ void SY7T609_UART::loop()
       {
         if (this->power_sensor_ != nullptr && bSuccess)
         {
-	  float data = readPower(resp);
+          float data = readPower(resp);
           this->power_sensor_->publish_state(data);
         }
         //ESP_LOGD(TAG, "Got POWER :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
@@ -115,7 +115,7 @@ void SY7T609_UART::loop()
       { 
         if (this->energy_sensor_ != nullptr && bSuccess)
         {
-	  float data = readEnergy(resp);
+          float data = readEnergy(resp);
           this->energy_sensor_->publish_state(data);
         }
         //ESP_LOGD(TAG, "Got ENERGY :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
@@ -126,10 +126,10 @@ void SY7T609_UART::loop()
       case PROCESS_STATE_READ_FREQUENCY: 
       {
         if (this->frequency_sensor_ != nullptr && bSuccess)
-	{
+        {
           float data = readFrequency(resp);
-	  this->frequency_sensor_->publish_state(data);
-	}
+          this->frequency_sensor_->publish_state(data);
+        }
         //ESP_LOGD(TAG, "Got FREQUENCY :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
         this->write_state_((process_state)(m_process_state + 1));
         break;
@@ -139,7 +139,7 @@ void SY7T609_UART::loop()
       {
         if (this->temperature_sensor_ != nullptr && bSuccess)
         {
-	  float data = readTemperature(resp);
+          float data = readTemperature(resp);
           this->temperature_sensor_->publish_state(data);
         }
         //ESP_LOGD(TAG, "Got TEMPERATURE :[4]0x%02x [3]0x%02x [2]0x%02x!", resp[4],resp[3],resp[2]);
@@ -619,8 +619,8 @@ float SY7T609_UART::readPower(const std::array<uint8_t,SSI_UART_READ_RECV_PKG_SI
   data = ((int32_t)array[4]<<16) | ((int32_t)array[3]<<8) | (uint32_t)array[2];
   if(data >= 0x800000) 
   {
-		data = 0x01000000 - data;
-	}
+    data = 0x01000000 - data;
+  }
   
   return data/1000.0f;
 }
@@ -631,8 +631,8 @@ float SY7T609_UART::readReactivePower(const std::array<uint8_t,SSI_UART_READ_REC
   data = ((uint32_t)array[4]<<16) | ((uint32_t)array[3]<<8) | (uint32_t)array[2];
   if(data >= 0x800000) 
   {
-		data = 0x01000000 - data;
-	}
+    data = 0x01000000 - data;
+  }
   return data/1000.0f;
 }
 
